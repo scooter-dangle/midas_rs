@@ -35,6 +35,7 @@ test.out.csv: test.py in.csv midas.so
 
 midas.so: $(LIB)
 	cp $< $@
+	strip $@
 
 .PHONY: $(LIB)
 $(LIB):
