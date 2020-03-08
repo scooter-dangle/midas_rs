@@ -1,7 +1,30 @@
+//! Rust implementation of
+//! [https://github.com/bhatiasiddharth/MIDAS](https://github.com/bhatiasiddharth/MIDAS)
+//!
+//! ```rust
+//! use midas_rs::{Int, Float, MidasR, default};
+//!
+//! fn main() {
+//!     let mut midas = MidasR::new(
+//!         default::NUM_ROWS,
+//!         default::NUM_BUCKETS,
+//!         default::M_VALUE,
+//!         default::ALPHA,
+//!     );
+//!
+//!     println!("{:.6}", midas.insert((1, 1, 1)));
+//!     println!("{:.6}", midas.insert((1, 2, 1)));
+//!     println!("{:.6}", midas.insert((1, 1, 2)));
+//!     println!("{:.6}", midas.insert((1, 2, 3)));
+//!
+//!     assert_eq!(midas.insert((1, 2, 4)), midas.query(1, 2));
+//! }
+//! ```
+
 use rand::rngs::SmallRng;
 
 pub mod default {
-    use super::*;
+    use super::{Float, Int};
 
     pub const NUM_ROWS: Int = 2;
     pub const NUM_BUCKETS: Int = 769;
@@ -229,6 +252,9 @@ impl MidasR {
         self.factor
     }
 
+    /// # Panics
+    ///
+    /// If `time < self.current_time()`
     pub fn insert(&mut self, (source, dest, time): (Int, Int, Int)) -> Float {
         assert!(self.current_time <= time);
 
@@ -274,6 +300,15 @@ impl MidasR {
         .ln_1p()
     }
 
+    /// Takes an iterator of `(source, dest, time)` thruples and returns
+    /// an iterator of corresponding scores.
+    ///
+    /// For a more ergonomic version, see `MidasIterator::midas_r`.
+    ///
+    /// # Panics
+    ///
+    /// Subsequent iterator will panic if ever passed a thruple where
+    /// the third element (the time) decreases from its predecessor.
     pub fn iterate(
         data: impl Iterator<Item = (Int, Int, Int)>,
         rows: Int,
@@ -308,6 +343,9 @@ impl Midas {
         self.current_time
     }
 
+    /// # Panics
+    ///
+    /// If `time < self.current_time()`
     pub fn insert(&mut self, (source, dest, time): (Int, Int, Int)) -> Float {
         assert!(self.current_time <= time);
 
@@ -333,6 +371,15 @@ impl Midas {
         }
     }
 
+    /// Takes an iterator of `(source, dest, time)` thruples and returns
+    /// an iterator of corresponding scores.
+    ///
+    /// For a more ergonomic version, see `MidasIterator::midas`.
+    ///
+    /// # Panics
+    ///
+    /// Subsequent iterator will panic if ever passed a thruple where
+    /// the third element (the time) decreases from its predecessor.
     pub fn iterate(
         data: impl Iterator<Item = (Int, Int, Int)>,
         rows: Int,
@@ -346,10 +393,50 @@ impl Midas {
 }
 
 pub trait MidasIterator<'a>: 'a + Sized + Iterator<Item = (Int, Int, Int)> {
+    /// Takes an iterator of `(source, dest, time)` thruples and returns
+    /// an iterator of corresponding scores.
+    ///
+    /// For a less ergonomic version, see `Midas::iterate`.
+    ///
+    /// # Panics
+    ///
+    /// Subsequent iterator will panic if ever passed a thruple where
+    /// the third element (the time) decreases from its predecessor.
     fn midas(self, rows: Int, buckets: Int, m_value: Int) -> Box<dyn 'a + Iterator<Item = Float>> {
         Box::new(Midas::iterate(self, rows, buckets, m_value))
     }
 
+    /// Takes an iterator of `(source, dest, time)` thruples and returns
+    /// an iterator of corresponding scores.
+    ///
+    /// For a less ergonomic version, see `MidasR::iterate`.
+    ///
+    /// ```rust
+    /// # fn main() {
+    /// use midas_rs::{default, MidasIterator};
+    ///
+    /// let iter = vec![
+    ///     (1, 1, 1),
+    ///     (1, 2, 1),
+    ///     (1, 1, 3),
+    ///     (1, 2, 4),
+    /// ].into_iter().midas_r(
+    ///     default::NUM_ROWS,
+    ///     default::NUM_BUCKETS,
+    ///     default::M_VALUE,
+    ///     default::ALPHA,
+    /// );
+    ///
+    /// for value in iter {
+    ///     println!("{:.6}", value);
+    /// }
+    /// # }
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// Subsequent iterator will panic if ever passed a thruple where
+    /// the third element (the time) decreases from its predecessor.
     fn midas_r(
         self,
         rows: Int,
