@@ -1,6 +1,6 @@
 [package]
 name = "midas_cli"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Scott Steele <scottlsteele@gmail.com>"]
 edition = "2018"
 license = "Apache-2.0"
@@ -9,6 +9,7 @@ categories = ["algorithms", "command-line-utilities", "data-structures", "scienc
 repository = "https://github.com/scooter-dangle/midas_rs"
 homepage = "https://github.com/scooter-dangle/midas_rs/tree/master/cli"
 keywords = ["midas", "streaming", "clustering", "count-min-sketch"]
+documentation = "https://docs.rs/midas_cli"
 
 [dependencies]
 midas_rs = { version = "0.1" }

@@ -1,6 +1,6 @@
 [package]
 name = "midas_rs"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Scott Steele <scottlsteele@gmail.com>"]
 edition = "2018"
 license = "Apache-2.0"
@@ -9,6 +9,7 @@ categories = ["algorithms", "data-structures", "science"]
 repository = "https://github.com/scooter-dangle/midas_rs"
 homepage = "https://github.com/scooter-dangle/midas_rs/tree/master/midas"
 keywords = ["midas", "streaming", "clustering", "count-min-sketch"]
+documentation = "https://docs.rs/midas_rs"
 
 [dependencies]
 rand = { version = "0.7", default_features = false, features = ["small_rng"] }

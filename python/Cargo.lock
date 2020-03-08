@@ -55,7 +55,7 @@ checksum = "3728d817d99e5ac407411fa471ff9800a778d88a24685968b36824eaf4bee400"
 
 [[package]]
 name = "midas_python"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "cpython",
  "midas_rs",
@@ -63,9 +63,9 @@ dependencies = [
 
 [[package]]
 name = "midas_rs"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "830b9c66179da9f66830abefe9ecc4848f21724ad4b0c16bc554c873e1fa988c"
+checksum = "916cfbc26b059997510339b31eb0fed33bbb440625d87a13f0e563d8df766d8a"
 dependencies = [
  "rand",
 ]
