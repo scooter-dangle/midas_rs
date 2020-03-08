@@ -1,0 +1,8 @@
+[package]
+name = "midas_rs"
+version = "0.1.0"
+authors = ["Scott Steele <scottlsteele@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+rand = { version = "0.7", default_features = false, features = ["small_rng"] }

@@ -1,0 +1,9 @@
+[package]
+name = "midas_cli"
+version = "0.1.0"
+authors = ["Scott Steele <scottlsteele@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+midas_rs = { path = "../midas" }
+structopt = { version = "0.3" }

@@ -1,0 +1,13 @@
+[package]
+name = "midas_python"
+version = "0.1.0"
+authors = ["Scott Steele <scottlsteele@gmail.com>"]
+edition = "2018"
+
+[lib]
+name = "midas"
+crate-type = ["cdylib"]
+
+[dependencies]
+midas_rs = { path = "../midas" }
+cpython = { version = "0.4", features = ["extension-module"] }
