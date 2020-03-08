@@ -15,5 +15,5 @@ name = "midas"
 crate-type = ["cdylib"]
 
 [dependencies]
-midas_rs = { path = "../midas" }
+midas_rs = { version = "0.1" }
 cpython = { version = "0.4", features = ["extension-module"] }

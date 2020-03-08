@@ -11,5 +11,5 @@ homepage = "https://github.com/scooter-dangle/midas_rs/tree/master/cli"
 keywords = ["midas", "streaming", "clustering", "count-min-sketch"]
 
 [dependencies]
-midas_rs = { path = "../midas" }
+midas_rs = { version = "0.1" }
 structopt = { version = "0.3" }
