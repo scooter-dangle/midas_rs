@@ -2,15 +2,11 @@
 //! [https://github.com/bhatiasiddharth/MIDAS](https://github.com/bhatiasiddharth/MIDAS)
 //!
 //! ```rust
-//! use midas_rs::{Int, Float, MidasR, default};
+//! use midas_rs::{Int, Float, MidasR};
 //!
 //! fn main() {
-//!     let mut midas = MidasR::new(
-//!         default::NUM_ROWS,
-//!         default::NUM_BUCKETS,
-//!         default::M_VALUE,
-//!         default::ALPHA,
-//!     );
+//!     // For configuration options, refer to MidasRParams
+//!     let mut midas = MidasR::new(Default::default());
 //!
 //!     println!("{:.6}", midas.insert((1, 1, 1)));
 //!     println!("{:.6}", midas.insert((1, 2, 1)));
@@ -213,6 +209,30 @@ fn counts_to_anom(total: Float, current: Float, current_time: Int) -> Float {
     (sqerr / current_mean) + (sqerr / (current_mean * float_max(1., (current_time - 1) as Float)))
 }
 
+pub struct MidasRParams {
+    /// Number of rows of buckets to use for internal Count-Min Sketches
+    pub rows: Int,
+    /// Number of buckets in each rows to use for internal Count-Min Sketches
+    pub buckets: Int,
+    /// Value used internally in determining bucket placement. Might be
+    /// made private in future version.
+    pub m_value: Int,
+    /// Factor used to to decay current values when our inputs signal
+    /// that time has ticked ahead.
+    pub alpha: Float,
+}
+
+impl Default for MidasRParams {
+    fn default() -> Self {
+        Self {
+            rows: default::NUM_ROWS,
+            buckets: default::NUM_BUCKETS,
+            m_value: default::M_VALUE,
+            alpha: default::ALPHA,
+        }
+    }
+}
+
 pub struct MidasR {
     current_time: Int,
     alpha: Float,
@@ -227,7 +247,14 @@ pub struct MidasR {
 }
 
 impl MidasR {
-    pub fn new(rows: Int, buckets: Int, m_value: Int, alpha: Float) -> Self {
+    pub fn new(
+        MidasRParams {
+            rows,
+            buckets,
+            m_value,
+            alpha,
+        }: MidasRParams,
+    ) -> Self {
         let dumb_seed = 538;
 
         Self {
@@ -248,6 +275,8 @@ impl MidasR {
         self.current_time
     }
 
+    /// Factor used to to decay current values when our inputs signal
+    /// that time has ticked ahead.
     pub fn alpha(&self) -> Float {
         self.alpha
     }
@@ -259,9 +288,15 @@ impl MidasR {
         assert!(self.current_time <= time);
 
         if time > self.current_time {
-            self.current_count.lower(self.alpha);
-            self.source_score.lower(self.alpha);
-            self.dest_score.lower(self.alpha);
+            // This deviation from the original C++ implementation is
+            // mentioned at
+            // https://github.com/bhatiasiddharth/MIDAS/issues/7#issuecomment-597185695
+            let time_delta = time - self.current_time;
+            let total_decay = self.alpha.powi(time_delta as _);
+            self.current_count.lower(total_decay);
+            self.source_score.lower(total_decay);
+            self.dest_score.lower(total_decay);
+
             self.current_time = time;
         }
 
@@ -311,14 +346,31 @@ impl MidasR {
     /// the third element (the time) decreases from its predecessor.
     pub fn iterate(
         data: impl Iterator<Item = (Int, Int, Int)>,
-        rows: Int,
-        buckets: Int,
-        m_value: Int,
-        alpha: Float,
+        params: MidasRParams,
     ) -> impl Iterator<Item = Float> {
-        let mut midas = Self::new(rows, buckets, m_value, alpha);
+        let mut midas = Self::new(params);
 
         data.map(move |datum| midas.insert(datum))
+    }
+}
+
+pub struct MidasParams {
+    /// Number of rows of buckets to use for internal Count-Min Sketches
+    pub rows: Int,
+    /// Number of buckets in each rows to use for internal Count-Min Sketches
+    pub buckets: Int,
+    /// Value used internally in determining bucket placement. Might be
+    /// made private in future version.
+    pub m_value: Int,
+}
+
+impl Default for MidasParams {
+    fn default() -> Self {
+        Self {
+            rows: default::NUM_ROWS,
+            buckets: default::NUM_BUCKETS,
+            m_value: default::M_VALUE,
+        }
     }
 }
 
@@ -329,7 +381,13 @@ pub struct Midas {
 }
 
 impl Midas {
-    pub fn new(rows: Int, buckets: Int, m_value: Int) -> Self {
+    pub fn new(
+        MidasParams {
+            rows,
+            buckets,
+            m_value,
+        }: MidasParams,
+    ) -> Self {
         let dumb_seed = 39;
 
         Self {
@@ -382,11 +440,9 @@ impl Midas {
     /// the third element (the time) decreases from its predecessor.
     pub fn iterate(
         data: impl Iterator<Item = (Int, Int, Int)>,
-        rows: Int,
-        buckets: Int,
-        m_value: Int,
+        params: MidasParams,
     ) -> impl Iterator<Item = Float> {
-        let mut midas = Self::new(rows, buckets, m_value);
+        let mut midas = Self::new(params);
 
         data.map(move |datum| midas.insert(datum))
     }
@@ -402,8 +458,18 @@ pub trait MidasIterator<'a>: 'a + Sized + Iterator<Item = (Int, Int, Int)> {
     ///
     /// Subsequent iterator will panic if ever passed a thruple where
     /// the third element (the time) decreases from its predecessor.
-    fn midas(self, rows: Int, buckets: Int, m_value: Int) -> Box<dyn 'a + Iterator<Item = Float>> {
-        Box::new(Midas::iterate(self, rows, buckets, m_value))
+    fn midas(self, params: MidasParams) -> Box<dyn 'a + Iterator<Item = Float>> {
+        Box::new(Midas::iterate(self, params))
+    }
+
+    fn thing() {
+        let iter = vec![(1, 1, 1), (1, 2, 1), (1, 1, 3), (1, 2, 4)]
+            .into_iter()
+            .midas_r(Default::default());
+
+        for value in iter {
+            println!("{:.6}", value);
+        }
     }
 
     /// Takes an iterator of `(source, dest, time)` thruples and returns
@@ -413,19 +479,11 @@ pub trait MidasIterator<'a>: 'a + Sized + Iterator<Item = (Int, Int, Int)> {
     ///
     /// ```rust
     /// # fn main() {
-    /// use midas_rs::{default, MidasIterator};
+    /// use midas_rs::MidasIterator;
     ///
-    /// let iter = vec![
-    ///     (1, 1, 1),
-    ///     (1, 2, 1),
-    ///     (1, 1, 3),
-    ///     (1, 2, 4),
-    /// ].into_iter().midas_r(
-    ///     default::NUM_ROWS,
-    ///     default::NUM_BUCKETS,
-    ///     default::M_VALUE,
-    ///     default::ALPHA,
-    /// );
+    /// let iter = vec![(1, 1, 1), (1, 2, 1), (1, 1, 3), (1, 2, 4)]
+    ///     .into_iter()
+    ///     .midas_r(Default::default());
     ///
     /// for value in iter {
     ///     println!("{:.6}", value);
@@ -437,14 +495,8 @@ pub trait MidasIterator<'a>: 'a + Sized + Iterator<Item = (Int, Int, Int)> {
     ///
     /// Subsequent iterator will panic if ever passed a thruple where
     /// the third element (the time) decreases from its predecessor.
-    fn midas_r(
-        self,
-        rows: Int,
-        buckets: Int,
-        m_value: Int,
-        alpha: Float,
-    ) -> Box<dyn 'a + Iterator<Item = Float>> {
-        Box::new(MidasR::iterate(self, rows, buckets, m_value, alpha))
+    fn midas_r(self, params: MidasRParams) -> Box<dyn 'a + Iterator<Item = Float>> {
+        Box::new(MidasR::iterate(self, params))
     }
 }
 
