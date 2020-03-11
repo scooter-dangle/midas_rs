@@ -16,3 +16,12 @@ To build+test from this directory, run
 ```sh
 make
 ```
+
+For example code, see [test.py](./test.py)
+
+Note: These bindings currently only expose the `MidasR` variant of the
+original implementation (which is the variant that includes time-based
+decay logic).
+
+For information on the algorithm or interpreting the output, see the
+link to the original as well as the corresponding paper.

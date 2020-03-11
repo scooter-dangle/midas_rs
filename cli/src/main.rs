@@ -4,9 +4,11 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use midas_rs::{default, Float, Int, MidasIterator};
+use midas_rs::{default, Float, Int, MidasIterator, MidasParams, MidasRParams};
 
 use structopt::StructOpt;
+
+const DELIM: char = ',';
 
 fn load_data<P>(
     input: P,
@@ -16,12 +18,11 @@ where
     P: AsRef<Path>,
 {
     let file = File::open(input.as_ref()).map_err(|err| format!("{}", err))?;
-    let delim = if is_directed { ',' } else { ':' };
     let iter = BufReader::new(file).lines().map(move |line| {
         match line
             .as_ref()
             .unwrap()
-            .split(delim)
+            .split(DELIM)
             .map(|field| field.parse().unwrap())
             .collect::<Vec<Int>>()
             .as_slice()
@@ -79,9 +80,18 @@ fn main() {
     let data = load_data(&input, directed).unwrap();
 
     let scores = if no_relations {
-        data.midas(rows, buckets, m_value)
+        data.midas(MidasParams {
+            rows,
+            buckets,
+            m_value,
+        })
     } else {
-        data.midas_r(rows, buckets, m_value, alpha)
+        data.midas_r(MidasRParams {
+            rows,
+            buckets,
+            m_value,
+            alpha,
+        })
     };
 
     use std::io::Write;

@@ -82,7 +82,7 @@ checksum = "eb147597cdf94ed43ab7a9038716637d2d1bf2bc571da995d0028dec06bd3018"
 
 [[package]]
 name = "midas_cli"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "midas_rs",
  "structopt",
@@ -90,9 +90,9 @@ dependencies = [
 
 [[package]]
 name = "midas_rs"
-version = "0.1.1"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "916cfbc26b059997510339b31eb0fed33bbb440625d87a13f0e563d8df766d8a"
+checksum = "571602fa7b8bebd37cab04d99f0000bc876e5134063010028844d71a25abec8a"
 dependencies = [
  "rand",
 ]

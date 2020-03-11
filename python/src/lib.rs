@@ -8,7 +8,7 @@ use std::{
 };
 
 use cpython::{PyResult, Python};
-use midas_rs::{default, Float, Int, MidasR as MidasR_};
+use midas_rs::{default, Float, Int, MidasR as MidasR_, MidasRParams};
 
 py_module_initializer!(midas, initmidas, PyInit_midas, |py, module| {
     module.add(py, "__doc__", "MidasR implementation")?;
@@ -31,9 +31,11 @@ py_class!(class MidasR |py| {
         rows: Int = default::NUM_ROWS,
         buckets: Int = default::NUM_BUCKETS,
         m_value: Int = default::M_VALUE,
-        factor: Float = default::ALPHA
+        alpha: Float = default::ALPHA
     ) -> PyResult<MidasR> {
-        MidasR::create_instance(py, RefCell::new(MidasR_::new(rows, buckets, m_value, factor)))
+        MidasR::create_instance(py, RefCell::new(MidasR_::new(MidasRParams { 
+            rows, buckets, m_value, alpha
+        })))
     }
 
     def insert(&self, source: Int, dest: Int, time: Int) -> PyResult<Float> {
@@ -48,7 +50,7 @@ py_class!(class MidasR |py| {
         Ok(self.value(py).borrow().current_time())
     }
 
-    def factor(&self) -> PyResult<Float> {
-        Ok(self.value(py).borrow().factor())
+    def alpha(&self) -> PyResult<Float> {
+        Ok(self.value(py).borrow().alpha())
     }
 });

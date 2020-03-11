@@ -1,6 +1,6 @@
 [package]
 name = "midas_python"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Scott Steele <scottlsteele@gmail.com>"]
 edition = "2018"
 license = "Apache-2.0"
@@ -16,5 +16,5 @@ name = "midas"
 crate-type = ["cdylib"]
 
 [dependencies]
-midas_rs = { version = "0.1" }
+midas_rs = { version = "0.2" }
 cpython = { version = "0.4", features = ["extension-module"] }

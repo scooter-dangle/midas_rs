@@ -1,6 +1,6 @@
 [package]
 name = "midas_cli"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Scott Steele <scottlsteele@gmail.com>"]
 edition = "2018"
 license = "Apache-2.0"
@@ -12,5 +12,5 @@ keywords = ["midas", "streaming", "clustering", "count-min-sketch"]
 documentation = "https://docs.rs/midas_cli"
 
 [dependencies]
-midas_rs = { version = "0.1" }
+midas_rs = { version = "0.2" }
 structopt = { version = "0.3" }
