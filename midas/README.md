@@ -1,6 +1,9 @@
 midas_rs
 ========
 
+[![](http://meritbadge.herokuapp.com/midas_rs)](https://crates.io/crates/midas_rs)
+[![Documentation](https://docs.rs/midas_rs/badge.svg)](https://docs.rs/midas_rs)
+
 Rust implementation of
 [https://github.com/bhatiasiddharth/MIDAS](https://github.com/bhatiasiddharth/MIDAS)
 

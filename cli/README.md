@@ -1,6 +1,8 @@
 midas CLI
 =========
 
+[![](http://meritbadge.herokuapp.com/midas_cli)](https://crates.io/crates/midas_cli)
+
 Rust implementation of https://github.com/bhatiasiddharth/MIDAS
 
 Installable via

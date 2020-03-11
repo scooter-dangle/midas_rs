@@ -1,6 +1,8 @@
 `midas_rs` Python bindings
 ==========================
 
+[![](http://meritbadge.herokuapp.com/midas_python)](https://crates.io/crates/midas_python)
+
 Python bindings to the Rust port of
 https://github.com/bhatiasiddharth/MIDAS
 
