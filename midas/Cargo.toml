@@ -1,9 +1,9 @@
 [package]
 name = "midas_rs"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Scott Steele <scottlsteele@gmail.com>"]
 edition = "2018"
-license = "Apache-2.0"
+license = "MIT OR Apache-2.0"
 description = "Rust lib port of MIDAS (Microcluster-Based Detector of Anomalies in Edge Streams)"
 categories = ["algorithms", "data-structures", "science"]
 repository = "https://github.com/scooter-dangle/midas_rs"
