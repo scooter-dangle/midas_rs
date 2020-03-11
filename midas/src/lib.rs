@@ -96,9 +96,9 @@ impl Row {
         self.buckets.len()
     }
 
-    fn lower(&mut self, factor: Float) {
+    fn lower(&mut self, alpha: Float) {
         for bucket in self.buckets.iter_mut() {
-            *bucket = *bucket * factor;
+            *bucket = *bucket * alpha;
         }
     }
 }
@@ -132,9 +132,9 @@ impl EdgeHash {
         }
     }
 
-    fn lower(&mut self, factor: Float) {
+    fn lower(&mut self, alpha: Float) {
         for row in self.rows.iter_mut() {
-            row.lower(factor);
+            row.lower(alpha);
         }
     }
 
@@ -178,9 +178,9 @@ impl NodeHash {
             .fold(FLOAT_MAX, float_min)
     }
 
-    fn lower(&mut self, factor: Float) {
+    fn lower(&mut self, alpha: Float) {
         for row in self.rows.iter_mut() {
-            row.lower(factor);
+            row.lower(alpha);
         }
     }
 
@@ -215,7 +215,7 @@ fn counts_to_anom(total: Float, current: Float, current_time: Int) -> Float {
 
 pub struct MidasR {
     current_time: Int,
-    factor: Float,
+    alpha: Float,
 
     current_count: EdgeHash,
     total_count: EdgeHash,
@@ -227,12 +227,12 @@ pub struct MidasR {
 }
 
 impl MidasR {
-    pub fn new(rows: Int, buckets: Int, m_value: Int, factor: Float) -> Self {
+    pub fn new(rows: Int, buckets: Int, m_value: Int, alpha: Float) -> Self {
         let dumb_seed = 538;
 
         Self {
             current_time: 0,
-            factor,
+            alpha,
 
             current_count: EdgeHash::new(rows, buckets, m_value, dumb_seed + 1),
             total_count: EdgeHash::new(rows, buckets, m_value, dumb_seed + 2),
@@ -248,8 +248,8 @@ impl MidasR {
         self.current_time
     }
 
-    pub fn factor(&self) -> Float {
-        self.factor
+    pub fn alpha(&self) -> Float {
+        self.alpha
     }
 
     /// # Panics
@@ -259,9 +259,9 @@ impl MidasR {
         assert!(self.current_time <= time);
 
         if time > self.current_time {
-            self.current_count.lower(self.factor);
-            self.source_score.lower(self.factor);
-            self.dest_score.lower(self.factor);
+            self.current_count.lower(self.alpha);
+            self.source_score.lower(self.alpha);
+            self.dest_score.lower(self.alpha);
             self.current_time = time;
         }
 
@@ -314,9 +314,9 @@ impl MidasR {
         rows: Int,
         buckets: Int,
         m_value: Int,
-        factor: Float,
+        alpha: Float,
     ) -> impl Iterator<Item = Float> {
-        let mut midas = Self::new(rows, buckets, m_value, factor);
+        let mut midas = Self::new(rows, buckets, m_value, alpha);
 
         data.map(move |datum| midas.insert(datum))
     }
@@ -442,9 +442,9 @@ pub trait MidasIterator<'a>: 'a + Sized + Iterator<Item = (Int, Int, Int)> {
         rows: Int,
         buckets: Int,
         m_value: Int,
-        factor: Float,
+        alpha: Float,
     ) -> Box<dyn 'a + Iterator<Item = Float>> {
-        Box::new(MidasR::iterate(self, rows, buckets, m_value, factor))
+        Box::new(MidasR::iterate(self, rows, buckets, m_value, alpha))
     }
 }
 
