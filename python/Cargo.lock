@@ -63,9 +63,9 @@ dependencies = [
 
 [[package]]
 name = "midas_rs"
-version = "0.2.0"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "571602fa7b8bebd37cab04d99f0000bc876e5134063010028844d71a25abec8a"
+checksum = "16aebc9d3cf7b9b2b621b8003a895b5d99b7a796a83b4708852f723d330b32ae"
 dependencies = [
  "rand",
 ]
