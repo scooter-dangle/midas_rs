@@ -7,12 +7,16 @@ Python bindings to the Rust port of
 https://github.com/bhatiasiddharth/MIDAS
 
 Requires
-* `cargo`—install via
+* `cargo` (part of the Rust toolchain)—install via
   ```sh
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
   ```
+  (Or visit rustup.sh for more detailed installation instructions.)
 * `make`
 * `python3`
+
+Requirements note: Building has only been tested on Linux (Ubuntu 18.04)
+and recent versions of macOS.
 
 To build+test from this directory, run
 ```sh

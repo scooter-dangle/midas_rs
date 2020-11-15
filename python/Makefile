@@ -13,10 +13,12 @@ PWD=$(shell pwd)
 ifeq ($(UNAME), Linux)
   DYLIB_EXT=so
   TARGET_DIR=target
+  STRIP=strip
 endif
 ifeq ($(UNAME), Darwin)
   DYLIB_EXT=dylib
   TARGET_DIR=target-$(UNAME)
+  STRIP=strip -x
 endif
 CARGO:=CARGO_TARGET_DIR=$(TARGET_DIR) cargo
 LIB:=$(TARGET_DIR)/release/libmidas.$(DYLIB_EXT)
@@ -35,7 +37,7 @@ test.out.csv: test.py in.csv midas.so
 
 midas.so: $(LIB)
 	cp $< $@
-	strip $@
+	$(STRIP) $@
 
 .PHONY: $(LIB)
 $(LIB):
