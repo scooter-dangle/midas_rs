@@ -12,5 +12,5 @@ keywords = ["midas", "streaming", "clustering", "count-min-sketch"]
 documentation = "https://docs.rs/midas_cli"
 
 [dependencies]
-midas_rs = { version = "0.2" }
+midas_rs = { version = "0.2", path = "../midas" }
 structopt = { version = "0.3" }
